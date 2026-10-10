@@ -7,7 +7,7 @@ A git management toolkit for configuring commit attribution and hooks across rep
 Run from any directory in a git repository:
 
 ```bash
-/mnt/Data/Works/prel/prel.sh
+prel.sh
 ```
 
 ## Commands
