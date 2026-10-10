@@ -1,0 +1,13 @@
+# Attribution for commits written with Mistral Vibe. The author stays whoever
+# is committing; it is the committer and the trailer that are set here, so
+# that what the history says about how it was written holds for the commits still
+# to come.
+[include]
+	path = ../configs/.gitconfig-base
+
+[committer]
+	name = Mistral Vibe
+	email = vibe@mistral.ai
+
+[commit]
+	coauthor = Mistral Vibe <vibe@mistral.ai>

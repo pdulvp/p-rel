@@ -1,0 +1,8 @@
+# Repository-local git settings shared by every attribution mode, kept in the
+# prel project so that every clone can commit the same way. Not read on its
+# own: a config file in a working tree is just a file, so one line in
+# .git/config pulls in a mode file, which in turn pulls in this one.
+
+# Appends the Co-Authored-By trailer, reading it from commit.coauthor so that
+# the same hook serves every mode. A hook rather than commit.template: a
+# template only prefills an editor, so it misses every `git commit -m`.

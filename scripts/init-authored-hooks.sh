@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# init-authored-hooks.sh - Initialize git hooks from prel/.githooks
+#
+# Can be run directly or sourced from prel.sh
+# Usage: prel init-authored-hooks [usage|register|unregister]
+#        OR: ./scripts/init-authored-hooks.sh [usage|register|unregister]
+
+init_authored_hooks() {
+	local action="${1-usage}"
+	
+	# Determine PREL_DIR - use exported var if available, otherwise calculate from script location
+	local PREL_DIR="${PREL_DIR:-}"
+	if [ -z "$PREL_DIR" ]; then
+		# Try to find prel.sh in the parent directory
+		local SCRIPT_DIR
+		SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+		PREL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+	fi
+	
+	local REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+	
+	if [ -z "$REPO_ROOT" ]; then
+		echo "Error: Not in a git repository" >&2
+		return 1 2>/dev/null || exit 1
+	fi
+	
+	cd "$REPO_ROOT"
+	
+	case "$action" in
+		usage)
+			cat <<EOF
+init-authored-hooks - Initialize git hooks from prel/.githooks
+
+Usage:
+  prel init-authored-hooks usage          Show this help
+  prel init-authored-hooks register       Set core.hooksPath to prel/.githooks
+  prel init-authored-hooks unregister     Remove core.hooksPath setting
+
+Description:
+  Registers the prel hooks directory with the current git repository.
+  The hooks are stored in the prel project and will be used for all commits.
+EOF
+			return 0 2>/dev/null || exit 0
+			;;
+		register)
+			local source_dir="$PREL_DIR/.githooks"
+			
+			# Check if prel .githooks exist
+			if [ ! -d "$source_dir" ]; then
+				echo "Error: No .githooks directory found in prel project ($source_dir)" >&2
+				return 1 2>/dev/null || exit 1
+			fi
+			
+			# Set core.hooksPath to the prel .githooks directory
+			if [ "$(git config --get core.hooksPath 2>/dev/null)" != "$source_dir" ]; then
+				git config --local core.hooksPath "$source_dir"
+				echo "Registered hooks from: $source_dir"
+			else
+				echo "Hooks already registered from: $source_dir"
+			fi
+			;;
+		unregister)
+			local current_hooks=$(git config --get core.hooksPath 2>/dev/null || true)
+			if [ -n "$current_hooks" ]; then
+				git config --local --unset core.hooksPath
+				echo "Unregistered hooks (was: $current_hooks)"
+			else
+				echo "No hooks currently registered"
+			fi
+			;;
+		*)
+			echo "Error: Unknown action '$action' for init-authored-hooks" >&2
+			echo "Try: prel init-authored-hooks usage" >&2
+			return 1 2>/dev/null || exit 1
+			;;
+	esac
+}
+
+# If this script is run directly (not sourced), call the function
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+	init_authored_hooks "$@"
+fi

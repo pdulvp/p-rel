@@ -1,0 +1,13 @@
+# Attribution for commits written with Claude. The author stays whoever is
+# committing; it is the committer and the trailer that are set here, so that
+# what the history says about how it was written holds for the commits still
+# to come.
+[include]
+	path = ../configs/.gitconfig-base
+
+[committer]
+	name = Claude Opus 5
+	email = noreply@anthropic.com
+
+[commit]
+	coauthor = Claude Opus 5 <noreply@anthropic.com>

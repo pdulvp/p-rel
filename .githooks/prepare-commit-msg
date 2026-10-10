@@ -1,0 +1,33 @@
+#!/bin/sh
+# prepare-commit-msg - Git hook to append Co-Authored-By trailer to commit messages
+#
+# This hook adds a Co-Authored-By trailer to commit messages when commit.coauthor
+# is configured. It is skipped for merge commits since they already carry
+# proper attribution from their original creation.
+#
+# The trailer value is read from the commit.coauthor git configuration setting.
+
+msg="$1"
+source="$2"
+
+# Skip for merge commits - these already carry proper attribution
+case "$source" in
+	merge)
+		exit 0
+		;;
+esac
+
+# Get co-author from git config
+# If not set or empty, silently exit - allows hook to work in repos without
+# co-author configuration
+trailer=$(git config --get commit.coauthor) || exit 0
+[ -n "$trailer" ] || exit 0
+
+# Append Co-Authored-By trailer if not already present
+# --if-exists doNothing: only add if trailer doesn't exist
+# --in-place: modify the commit message file directly
+git interpret-trailers \
+	--in-place \
+	--if-exists doNothing \
+	--trailer "Co-Authored-By: $trailer" \
+	"$msg"
