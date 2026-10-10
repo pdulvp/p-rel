@@ -7,8 +7,6 @@
 #   prel <command> [action]     Execute a command with optional action
 #   prel usage                 Show all available commands and their usage
 
-set -e
-
 # Get the directory where this script is located (prel project root)
 PREL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -16,15 +14,18 @@ PREL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PREL_DIR
 
 # Get the current git repository root
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || REPO_ROOT=""
 
-# If not in a git repo, error out (unless showing usage)
+# If not in a git repo, error out (unless showing usage or listing commands)
 if [ -z "$REPO_ROOT" ] && [ "${1-}" != "usage" ] && [ -n "${1-}" ]; then
 	echo "Error: Not in a git repository" >&2
 	exit 1
 fi
 
-cd "$REPO_ROOT"
+# Change to repo root if we're in one
+if [ -n "$REPO_ROOT" ]; then
+	cd "$REPO_ROOT"
+fi
 
 # Load all command scripts from scripts/ directory
 SCRIPTS_DIR="$PREL_DIR/scripts"
@@ -97,6 +98,12 @@ fi
 if [ "${1-}" = "usage" ]; then
 	show_all_usage
 	exit 0
+fi
+
+# If not in a git repo, show error
+if [ -z "$REPO_ROOT" ]; then
+	echo "Error: Not in a git repository" >&2
+	exit 1
 fi
 
 # Convert command name to function name (replace - with _)

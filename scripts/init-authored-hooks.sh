@@ -8,27 +8,9 @@
 init_authored_hooks() {
 	local action="${1-usage}"
 	
-	# Determine PREL_DIR - use exported var if available, otherwise calculate from script location
-	local PREL_DIR="${PREL_DIR:-}"
-	if [ -z "$PREL_DIR" ]; then
-		# Try to find prel.sh in the parent directory
-		local SCRIPT_DIR
-		SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-		PREL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-	fi
-	
-	local REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-	
-	if [ -z "$REPO_ROOT" ]; then
-		echo "Error: Not in a git repository" >&2
-		return 1 2>/dev/null || exit 1
-	fi
-	
-	cd "$REPO_ROOT"
-	
-	case "$action" in
-		usage)
-			cat <<EOF
+	# If just showing usage, don't need a git repo
+	if [ "$action" = "usage" ]; then
+		cat <<EOF
 init-authored-hooks - Initialize git hooks from prel/.githooks
 
 Usage:
@@ -40,15 +22,34 @@ Description:
   Registers the prel hooks directory with the current git repository.
   The hooks are stored in the prel project and will be used for all commits.
 EOF
-			return 0 2>/dev/null || exit 0
-			;;
+		return 0
+	fi
+	
+	# Determine PREL_DIR - use exported var if available, otherwise calculate from script location
+	local PREL_DIR="${PREL_DIR:-}"
+	if [ -z "$PREL_DIR" ]; then
+		local SCRIPT_DIR
+		SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+		PREL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+	fi
+	
+	local REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+	
+	if [ -z "$REPO_ROOT" ]; then
+		echo "Error: Not in a git repository" >&2
+		return 1
+	fi
+	
+	cd "$REPO_ROOT"
+	
+	case "$action" in
 		register)
 			local source_dir="$PREL_DIR/.githooks"
 			
 			# Check if prel .githooks exist
 			if [ ! -d "$source_dir" ]; then
 				echo "Error: No .githooks directory found in prel project ($source_dir)" >&2
-				return 1 2>/dev/null || exit 1
+				return 1
 			fi
 			
 			# Set core.hooksPath to the prel .githooks directory
@@ -71,7 +72,7 @@ EOF
 		*)
 			echo "Error: Unknown action '$action' for init-authored-hooks" >&2
 			echo "Try: prel init-authored-hooks usage" >&2
-			return 1 2>/dev/null || exit 1
+			return 1
 			;;
 	esac
 }
