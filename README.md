@@ -15,16 +15,20 @@ prel.sh
 ### prel usage
 Show detailed help for all available commands.
 
-### prel init-authored-hooks
+### prel init-authored-hooks (or **hooks**)
 Manage git hooks from the prel project.
 
 ```bash
 prel init-authored-hooks usage          # Show help
 prel init-authored-hooks register       # Set core.hooksPath to prel/.githooks
 prel init-authored-hooks unregister     # Remove core.hooksPath setting
+
+# Shortcut:
+prel hooks register
+prel hooks unregister
 ```
 
-### prel switch-author
+### prel switch-author (or **sa**)
 Switch commit author and co-author mode.
 
 ```bash
@@ -33,6 +37,11 @@ prel switch-author          # Show current mode
 prel switch-author default  # Use default (no co-author)
 prel switch-author claude   # Use Claude mode
 prel switch-author mistral  # Use Mistral Vibe mode
+
+# Shortcut:
+prel sa claude
+prel sa mistral
+prel sa default
 ```
 
 ## Direct Script Usage

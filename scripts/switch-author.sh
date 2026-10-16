@@ -4,6 +4,12 @@
 # Can be run directly or sourced from prel.sh
 # Usage: prel switch-author [usage|default|claude|mistral]
 #        OR: ./scripts/switch-author.sh [usage|default|claude|mistral]
+# Shortcut: prel sa [usage|default|claude|mistral]
+
+# Shortcut function - sa is an alias for switch_author
+sa() {
+	switch_author "$@"
+}
 
 switch_author() {
 	local action="${1-}"

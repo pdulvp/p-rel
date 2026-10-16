@@ -4,6 +4,12 @@
 # Can be run directly or sourced from prel.sh
 # Usage: prel init-authored-hooks [usage|register|unregister]
 #        OR: ./scripts/init-authored-hooks.sh [usage|register|unregister]
+# Shortcut: prel hooks [usage|register|unregister]
+
+# Shortcut function - hooks is an alias for init_authored_hooks
+hooks() {
+	init_authored_hooks "$@"
+}
 
 init_authored_hooks() {
 	local action="${1-usage}"
